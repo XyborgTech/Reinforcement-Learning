@@ -66,33 +66,3 @@ while not done:
 print(cnt, 'moves')
 
 
-
-
-'''import gym
-import numpy as np
-import tensorflow as tf
-
-
-env = gym.make('MountainCar-v0')
-env.reset()
-for _ in range(1000):
-    env.render()
-    env.step(env.action_space.sample()) # take a random action
-env.close()
-
-def learn(self):
-    state_memory = np.array(self.state_memory)
-    action_memory = np.array(self.action_memory)
-    reward_memory = np.array(self.reward_memory)
-    
-    G = np.zeros_like(reward_memory)
-    for t in range(len(reward_memory)):
-        G_sum = 0
-        discount = 1
-        for k in range(t, len(reward_memory)):
-            G_sum += reward_memory[k]*discount
-            discount *= self.gamma
-            
-        G[t] = G_sum
-    
-    mean = np.mean'''
