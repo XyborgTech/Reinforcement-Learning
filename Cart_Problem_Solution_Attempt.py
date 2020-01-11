@@ -18,7 +18,6 @@ for i in range(100): #runs for 100 games and we find average later
     lenght = []
     for j in range(100):
         observation = env.reset()
-        #print(observation, ' -  this is the observation') #observation was 4 random numbers generated differently each loop same episode
         done = False
         cnt = 0
         
@@ -45,7 +44,8 @@ for i in range(100): #runs for 100 games and we find average later
     episode_lenghts.append(average_lenght) #keeps adding best average to episode lenght array
 
     if i % 10 == 0: #very smart method prints best lenght every 10 games
-        print(bestLenght, '  < best lenght ', i)
+        print(cnt, bestLenght, '  < best lenght ', i)
+
 #reset params
 done = False
 cnt = 0
@@ -54,15 +54,47 @@ observation = env.reset()
 
 #so this final loop runs it one last time, but with the best weights, and those optimized weights (after 100 cycles) allow it to solve the problem
 while not done:
+    env.render()
     cnt += 1
     action = 1 if np.dot(observation, best_weights) > 0 else 0
     
     observation, reward, done, _ = env.step(action) #should return done when solved
     
     if done:
+        env.close()
         break
 
 
 print(cnt, 'moves')
 
 
+
+
+'''import gym
+import numpy as np
+import tensorflow as tf
+
+
+env = gym.make('MountainCar-v0')
+env.reset()
+for _ in range(1000):
+    env.render()
+    env.step(env.action_space.sample()) # take a random action
+env.close()
+
+def learn(self):
+    state_memory = np.array(self.state_memory)
+    action_memory = np.array(self.action_memory)
+    reward_memory = np.array(self.reward_memory)
+    
+    G = np.zeros_like(reward_memory)
+    for t in range(len(reward_memory)):
+        G_sum = 0
+        discount = 1
+        for k in range(t, len(reward_memory)):
+            G_sum += reward_memory[k]*discount
+            discount *= self.gamma
+            
+        G[t] = G_sum
+    
+    mean = np.mean'''
