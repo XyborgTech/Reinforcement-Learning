@@ -174,4 +174,4 @@ for i_episode in range(MAX_EPISODE):
 
 
 
-np.savetxt("CartPoleData_ActorCritic1.txt", np.transpose([episodes, reward]), fmt="%.3f")
+np.savetxt("OLD_ActorCritic10.txt", np.transpose([episodes, reward]), fmt="%.3f")
