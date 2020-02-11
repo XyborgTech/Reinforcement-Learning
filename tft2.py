@@ -6,7 +6,7 @@ from keras.layers import Dense
 from keras.models import Sequential
 from keras.optimizers import Adam
 
-EPISODES = 10001
+EPISODES = 5001
 
 
 # A2C(Advantage Actor-Critic) agent for the Cartpole
@@ -115,6 +115,7 @@ if __name__ == "__main__":
                     scores.append(ave_score/50)
                     episodes.append(e)
                     ave_score = 0
+                    np.savetxt("NEW_ActorCritic10.txt", np.transpose([episodes, scores]), fmt="%.3f")
                 #pylab.plot(episodes, scores, 'b')
                 #pylab.savefig("./save_graph/cartpole_a2c.png")
                 print("episode:", e, "  score:", score)
