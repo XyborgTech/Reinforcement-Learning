@@ -22,7 +22,7 @@ MAX_EPISODE = 5001
 MAX_EP_STEPS = 500   # maximum time step in one episode
 #RENDER = False  # rendering wastes time
 
-GAMMA = 0.95     # reward discount in TD error
+GAMMA = 0.99     # reward discount in TD error
 LR_A = 0.001    # learning rate for actor
 LR_C = 0.005     # learning rate for critic
 
