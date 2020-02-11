@@ -45,7 +45,7 @@ class Actor(object):
         with tf.variable_scope('Actor'):
             l1 = tf.layers.dense(
                 inputs=self.s,
-                units=20,    # number of hidden units
+                units=64,    # number of hidden units 20>64
                 activation=tf.nn.relu,
                 kernel_initializer=tf.random_normal_initializer(0., .1),    # weights
                 bias_initializer=tf.constant_initializer(0.1),  # biases
@@ -91,7 +91,7 @@ class Critic(object):
         with tf.variable_scope('Critic'):
             l1 = tf.layers.dense(
                 inputs=self.s,
-                units=64,  # number of hidden units
+                units=64,  # number of hidden units 20>64
                 activation=tf.nn.relu,  # None
                 # have to be linear to make sure the convergence of actor.
                 # But linear approximator seems hardly learns the correct Q.
@@ -170,7 +170,7 @@ for i_episode in range(MAX_EPISODE):
                 episodes.append(i_episode)
                 reward.append(ave_score/50)
                 ave_score = 0
-                np.savetxt("OLD_ActorCritic8.txt", np.transpose([episodes, reward]), fmt="%.3f")
+                np.savetxt("64_ActorCritic2.txt", np.transpose([episodes, reward]), fmt="%.3f")
             break
 
 
