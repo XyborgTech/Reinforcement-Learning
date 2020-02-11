@@ -19,12 +19,12 @@ tf.set_random_seed(2)  # reproducible
 #OUTPUT_GRAPH = False
 MAX_EPISODE = 5001
 #DISPLAY_REWARD_THRESHOLD = 1000  # renders environment if total episode reward is greater then this threshold
-MAX_EP_STEPS = 500   # maximum time step in one episode
+MAX_EP_STEPS = 501   # maximum time step in one episode
 #RENDER = False  # rendering wastes time
 
 GAMMA = 0.99     # reward discount in TD error
-LR_A = 0.001    # learning rate for actor
-LR_C = 0.005     # learning rate for critic
+LR_A = 0.0001    # learning rate for actor
+LR_C = 0.001     # learning rate for critic
 
 env = gym.make('CartPole-v1')
 env.seed(1)  # reproducible
@@ -91,7 +91,7 @@ class Critic(object):
         with tf.variable_scope('Critic'):
             l1 = tf.layers.dense(
                 inputs=self.s,
-                units=20,  # number of hidden units
+                units=64,  # number of hidden units
                 activation=tf.nn.relu,  # None
                 # have to be linear to make sure the convergence of actor.
                 # But linear approximator seems hardly learns the correct Q.
@@ -170,9 +170,139 @@ for i_episode in range(MAX_EPISODE):
                 episodes.append(i_episode)
                 reward.append(ave_score/50)
                 ave_score = 0
-                np.savetxt("OLD_ActorCritic6.txt", np.transpose([episodes, reward]), fmt="%.3f")
+                np.savetxt("OLD_ActorCritic8.txt", np.transpose([episodes, reward]), fmt="%.3f")
             break
 
 
 
 
+
+""" 
+ #PsuedoCode Actor-Critic#
+ 
+'''
+ 
+ initialize state and policy
+ start with a sample a according to a multiplied return policy
+ 
+ for each step in 1 episode
+	sample reward and transition to new state
+	sample action based on returned state and action
+	
+	CRITIC compute value based on reward + discounted state/action - previous state/action estimate
+	ACTOR update policy using policy gradient method (AdamOptimizer prob)
+	
+	CRITIC update weights with linear TD(0) equation
+	
+	assign a < a' and s < s'
+	
+	loop
+'''
+
+import gym
+import numpy as np
+
+import tensorflow.compat.v1 as tf
+tf.disable_v2_behavior()
+
+np.random.seed(2)
+tf.set_random_seed(2)
+
+MAX_EPISODE = 3000
+DISPLAY_REWARD_THRESHOLD = 200  # renders environment if total episode reward is greater then this threshold
+MAX_EP_STEPS = 1000   # maximum time step in one episode
+RENDER = False  # rendering wastes time
+GAMMA = 0.9     # reward discount in TD error
+LR_A = 0.001    # learning rate for actor
+LR_C = 0.01     # learning rate for critic
+
+env = gym.make('CartPole-v0')
+sess = tf.Session()
+sess.run(tf.global_variables_initializer())
+
+env.seed(1)  # reproducible
+env = env.unwrapped
+
+n_actions = env.action_space.n
+
+s = tf.placeholder(shape=[None, 4], dtype=tf.float32)
+a = tf.placeholder(tf.int32, None, "act")
+
+episodes = 3000
+
+lr = 0.01
+LR_A = 0.001
+LR_C = 0.01
+
+
+###Actor Policy Gradient###
+td_error = tf.placeholder(tf.float32, None, "td_error")
+
+l1 = tf.layers.dense(
+				inputs=s,
+				units=20,    # number of hidden units
+				activation=tf.nn.relu,
+				kernel_initializer=tf.random_normal_initializer(0., .1),    # weights
+				bias_initializer=tf.constant_initializer(0.1),  # biases
+				name='l1'
+			)
+
+acts_prob = tf.layers.dense(
+				inputs=l1,
+				units=n_actions,    # output units
+				activation=tf.nn.softmax,   # get action probabilities
+				kernel_initializer=tf.random_normal_initializer(0., .1),  # weights
+				bias_initializer=tf.constant_initializer(0.1),  # biases
+				name='acts_prob'
+			)
+			
+log_prob = tf.log(acts_prob[0, a])
+exp_v = tf.reduce_mean(log_prob * td_error)
+train_op = tf.train.AdamOptimizer(lr).minimize(-exp_v)
+
+
+for i in range(episodes):
+	state = env.reset()
+	t=0
+	track_r = []
+	
+	while True:
+		act_prob = sess.run(acts_prob, feed_dict={state: [s]})
+		a = np.random.choice(range(2), p=act_prob[0])
+		
+		s_, r, done, _ = env.step(a)
+		
+		if done: r = -20
+		
+		track_r.append(r)
+		
+		#critic.learn
+		s, s_ = s[np.newaxis, :], s_[np.newaxis, :]
+		v_ = sess.run(v, {s: s_})
+		td_error, _ = sess.run([td_error, train_op],
+										  {s: s, v_: v_, r: r})
+
+		#actor.learn
+		s = s[np.newaxis, :]
+		feed_dict = {s: s, a: a, td_error: td}
+		_, exp_v = sess.run([train_op, exp_v], feed_dict)
+
+		s = s_
+		t += 1
+		
+		if done or t >= 1000:
+			ep_rs_sum = sum(track_r)
+			
+			if 'running_reward' not in globals():
+				running_reward = ep_rs_sum
+			else:
+				running_reward = running_reward * 0.95 + ep_rs_sum * 0.05
+			
+			print("episode:", i_episode, " reward:", int(running_reward))
+			break
+		
+
+
+
+
+"""
