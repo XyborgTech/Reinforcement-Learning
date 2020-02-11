@@ -124,4 +124,4 @@ if __name__ == "__main__":
                 '''if np.mean(scores[-min(10, len(scores)):]) > 490:
                     sys.exit()'''
 
-np.savetxt("CartPoleData_ActorCritic7.txt", np.transpose([episodes, scores]), fmt="%.3f")
+np.savetxt("NEW_ActorCritic10.txt", np.transpose([episodes, scores]), fmt="%.3f")
