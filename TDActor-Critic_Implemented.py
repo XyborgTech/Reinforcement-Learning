@@ -8,8 +8,8 @@ gym 0.8.0
 """
 
 import numpy as np
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+import tensorflow as tf #.compat.v1 as tf
+#tf.disable_v2_behavior()
 import gym
 
 np.random.seed(2)
@@ -168,10 +168,11 @@ for i_episode in range(MAX_EPISODE):
             print("episode:", i_episode, "  reward:", int(running_reward))
             if i_episode%50==0:
                 episodes.append(i_episode)
-                reward.append(ave_score)
+                reward.append(ave_score/50)
                 ave_score = 0
+                np.savetxt("OLD_ActorCritic6.txt", np.transpose([episodes, reward]), fmt="%.3f")
             break
 
 
 
-np.savetxt("OLD_ActorCritic10.txt", np.transpose([episodes, reward]), fmt="%.3f")
+
