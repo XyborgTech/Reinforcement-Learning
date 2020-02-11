@@ -23,8 +23,8 @@ MAX_EP_STEPS = 500   # maximum time step in one episode
 #RENDER = False  # rendering wastes time
 
 GAMMA = 0.95     # reward discount in TD error
-LR_A = 0.0001    # learning rate for actor
-LR_C = 0.001     # learning rate for critic
+LR_A = 0.001    # learning rate for actor
+LR_C = 0.005     # learning rate for critic
 
 env = gym.make('CartPole-v1')
 env.seed(1)  # reproducible
