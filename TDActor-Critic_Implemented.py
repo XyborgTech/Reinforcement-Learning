@@ -2,9 +2,6 @@
 Actor-Critic using TD-error as the Advantage, Reinforcement Learning.
 The cart pole example. Policy is oscillated.
 View more on my tutorial page: https://morvanzhou.github.io/tutorials/
-Using:
-tensorflow 1.0
-gym 0.8.0
 """
 
 import numpy as np
@@ -45,7 +42,7 @@ class Actor(object):
         with tf.variable_scope('Actor'):
             l1 = tf.layers.dense(
                 inputs=self.s,
-                units=64,    # number of hidden units 20>64
+                units=64,    # number of hidden units
                 activation=tf.nn.relu,
                 kernel_initializer=tf.random_normal_initializer(0., .1),    # weights
                 bias_initializer=tf.constant_initializer(0.1),  # biases
@@ -91,7 +88,7 @@ class Critic(object):
         with tf.variable_scope('Critic'):
             l1 = tf.layers.dense(
                 inputs=self.s,
-                units=64,  # number of hidden units 20>64
+                units=20,  # number of hidden units
                 activation=tf.nn.relu,  # None
                 # have to be linear to make sure the convergence of actor.
                 # But linear approximator seems hardly learns the correct Q.
@@ -170,31 +167,7 @@ for i_episode in range(MAX_EPISODE):
                 episodes.append(i_episode)
                 reward.append(ave_score/50)
                 ave_score = 0
-                np.savetxt("64_ActorCritic2.txt", np.transpose([episodes, reward]), fmt="%.3f")
+                np.savetxt("Other_ActorCritic4.txt", np.transpose([episodes, reward]), fmt="%.3f")
             break
 
 
-
-
-
-
- #PsuedoCode Actor-Critic#
- 
-'''
- 
- initialize state and policy
- start with a sample a according to a multiplied return policy
- 
- for each step in 1 episode
-	sample reward and transition to new state
-	sample action based on returned state and action
-	
-	CRITIC compute value based on reward + discounted state/action - previous state/action estimate
-	ACTOR update policy using policy gradient method (AdamOptimizer prob)
-	
-	CRITIC update weights with linear TD(0) equation
-	
-	assign a < a' and s < s'
-	
-	loop
-'''
