@@ -5,19 +5,15 @@ View more on my tutorial page: https://morvanzhou.github.io/tutorials/
 """
 
 import numpy as np
-import tensorflow as tf #.compat.v1 as tf
-#tf.disable_v2_behavior()
+import tensorflow as tf
 import gym
 
 np.random.seed(2)
 tf.set_random_seed(2)  # reproducible
 
 # Superparameters
-#OUTPUT_GRAPH = False
 MAX_EPISODE = 5001
-#DISPLAY_REWARD_THRESHOLD = 1000  # renders environment if total episode reward is greater then this threshold
 MAX_EP_STEPS = 501   # maximum time step in one episode
-#RENDER = False  # rendering wastes time
 
 GAMMA = 0.99     # reward discount in TD error
 LR_A = 0.0001    # learning rate for actor
@@ -131,41 +127,43 @@ critic = Critic(sess, n_features=N_F, lr=LR_C)     # we need a good teacher, so 
 sess.run(tf.global_variables_initializer())
 
 ave_score = 0
+Cycles = 21
 
-for i_episode in range(MAX_EPISODE):
-    s = env.reset()
-    t = 0
-    track_r = []
-    while True:
-        #if RENDER: env.render()
+for cyc in range(Cycles):
+    for i_episode in range(MAX_EPISODE):
+        s = env.reset()
+        t = 0
+        track_r = []
+        while True:
+            #if RENDER: env.render()
 
-        a = actor.choose_action(s)
+            a = actor.choose_action(s)
 
-        s_, r, done, info = env.step(a)
+            s_, r, done, info = env.step(a)
 
-        if done: r = -20
+            if done: r = -20
 
-        track_r.append(r)
+            track_r.append(r)
 
-        td_error = critic.learn(s, r, s_)  # gradient = grad[r + gamma * V(s_) - V(s)]
-        actor.learn(s, a, td_error)     # true_gradient = grad[logPi(s,a) * td_error]
+            td_error = critic.learn(s, r, s_)  # gradient = grad[r + gamma * V(s_) - V(s)]
+            actor.learn(s, a, td_error)     # true_gradient = grad[logPi(s,a) * td_error]
 
-        s = s_
-        t += 1
+            s = s_
+            t += 1
 
-        if done or t >= MAX_EP_STEPS:
-            ep_rs_sum = sum(track_r)
+            if done or t >= MAX_EP_STEPS:
+                ep_rs_sum = sum(track_r)
 
-            if 'running_reward' not in globals():
-                running_reward = ep_rs_sum
-            else:
-                running_reward = running_reward * 0.95 + ep_rs_sum * 0.05
-            ave_score = ave_score + running_reward
-            
-            print("episode:", i_episode, "  reward:", int(running_reward))
-            if i_episode%50==0:
-                episodes.append(i_episode)
-                reward.append(ave_score/50)
-                ave_score = 0
-                np.savetxt("C64_ActorCritic6.txt", np.transpose([episodes, reward]), fmt="%.3f")
-            break
+                if 'running_reward' not in globals():
+                    running_reward = ep_rs_sum
+                else:
+                    running_reward = running_reward * 0.95 + ep_rs_sum * 0.05
+                ave_score = ave_score + running_reward
+
+                print("episode:", i_episode, "  reward:", int(running_reward))
+                if i_episode%50==0:
+                    episodes.append(i_episode)
+                    reward.append(ave_score/50)
+                    ave_score = 0
+                    np.savetxt("C64_ActorCritic" + str(cyc) + ".txt", np.transpose([episodes, reward]), fmt="%.3f")
+                break
